@@ -1,0 +1,79 @@
+<snippet>
+	<content><![CDATA[
+struct Dinic
+{
+	struct FlowEdge{
+		int u, v, flow=0, cap;
+		FlowEdge(int u, int v, int cap) : u(u), v(v), cap(cap) {}
+	};
+	vector<FlowEdge> edge;
+	vector<vector<int>> adj;
+	int n, m=0;
+	int s, t;
+	vector<int> level, ptr;
+	queue<int>q;
+
+	Dinic(int n, int s, int t) : n(n), s(s), t(t){
+		level.resize(n+5);
+		ptr.resize(n+5);
+		adj.resize(n+5);
+	}
+
+	void add_edge(int u, int v, int cap){
+		edge.pb(FlowEdge(u, v, cap));
+		edge.pb(FlowEdge(v, u, 0));
+		adj[u].pb(m);
+		adj[v].pb(m+1);
+		m+=2;
+	}
+
+	bool bfs(){
+		fill(level.begin(), level.end() , -1);
+		level[s] = 0;
+		q.push(s);
+		while(!q.empty()){
+			int v = q.front();
+			q.pop();
+			for(auto i:adj[v]){
+				if(edge[i].cap - edge[i].flow < 1 || level[edge[i].v]!=-1)
+					continue;
+				level[edge[i].v] = level[v]+1;
+				q.push(edge[i].v);
+			}
+		}
+		return level[t] != -1;
+	}
+
+	int dfs(int v, int pushed){
+		if(pushed == 0) return 0;
+		if(v==t) return pushed;
+		for(int& cid = ptr[v]; cid < adj[v].size(); cid++){
+			int id = adj[v][cid];
+			int u = edge[id].v;
+			if(level[v]+1!=level[u] || edge[id].cap-edge[id].flow < 1)
+				continue;
+			int temp = dfs(u, min(pushed, edge[id].cap - edge[id].flow ));
+			if(!temp) continue;
+			edge[id].flow += temp;
+			edge[id^1].flow -= temp;
+			return temp;
+		}
+		return 0;
+	}
+
+	int flow(){
+		int f=0;
+		while(bfs()){
+			fill(ptr.begin(), ptr.end() , 0);
+			while(int pushed=dfs(s, inf))
+				f += pushed;
+		}
+		return f;
+	}
+};
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>max-flow</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+</snippet>

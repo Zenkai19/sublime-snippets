@@ -1,0 +1,20 @@
+<snippet>
+	<content><![CDATA[
+int p[N];
+int root(int a){
+    if(p[a]<0) return a;
+    return p[a] = root(p[a]);
+}
+void merge(int a, int b){
+    if((a=root(a))==(b=root(b))) return;
+    if(p[a]>p[b]) swap(a, b);
+    p[a] += p[b];
+    p[b] = a;
+}
+memset(p, -1, sizeof p);
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>dsu</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+</snippet>

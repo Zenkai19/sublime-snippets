@@ -1,0 +1,45 @@
+<snippet>
+	<content><![CDATA[
+int t[M], root[N], lc[M], rc[M], cnt;
+inline int combine(int a, int b){ return a^b; }
+int build(int l, int r){
+    int id = ++cnt;
+    if(l==r) {
+        t[id] = 0;
+        return id;
+    }
+    int m = l+r>>1;
+    lc[id] = build(l, m);
+    rc[id] = build(m+1, r);
+    t[id] = combine(t[lc[id]], t[rc[id]]);
+    return id;
+}
+
+int upd(int onode, int l, int r, int idx, int v){
+    int id = ++cnt;
+    if(l==r){
+        t[id] = v;
+        return id;
+    }
+    int m = (l+r)>>1;
+    lc[id] = lc[onode]; rc[id] = rc[onode];
+    if(idx<=m) lc[id] = upd(lc[onode], l, m, idx, v);
+    else rc[id] = upd(rc[onode], m+1, r, idx, v);
+    t[id] = combine(t[lc[id]], t[rc[id]]);
+    return id;
+}
+
+int q(int id, int l, int r, int x, int y){
+    if(r<x || l>y || x>y) return 0;
+    if(l==x && r==y) return t[id];
+    int m = l+r>>1, a, b;
+    a = q(lc[id], l, m, x, min(y, m));
+    b = q(rc[id], m+1, r, max(m+1, x), y);
+    return combine(a, b);
+}
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>Persistance</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+</snippet>

@@ -1,0 +1,22 @@
+<snippet>
+	<content><![CDATA[
+string s;
+int h[N], p[N], in[N], z=29;
+inline int expo(int n, int k, int p = inf) {int r = 1; for (; k; k >>= 1) {if (k & 1) r = r * n % p; n = n * n % p;} return r;}
+inline int util(int l, int r){ return (h[r]-h[l-1]+inf)%inf*in[l-1]%inf; }
+void pre(){
+    int n = s.size();
+    p[0] = 1;
+    for(int i=0; i<n; i++){
+        h[i+1] = (h[i] + p[i]*(s[i]-'a'+1))%inf;
+        p[i+1] = p[i]*z%inf; 
+    }
+    in[n] = expo(p[n], inf-2);
+    for(int i=n; i>=1; i--) in[i-1] = in[i]*z%inf;
+}
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>hash</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+</snippet>

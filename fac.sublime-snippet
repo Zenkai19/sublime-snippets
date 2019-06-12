@@ -1,0 +1,13 @@
+<snippet>
+	<content><![CDATA[
+int in[N], f[N];
+inline int expo(int n, int k, int p = inf) {int r = 1; for (; k; k >>= 1) {if (k & 1) r = r * n % p; n = n * n % p;} return r;}
+inline int inv(int a, int p = inf) {return expo(a, p - 2, p);}
+inline int cc(int a, int b){ if(a<b || b<0) return 0; return f[a]*in[b]%inf*in[a-b]%inf; }
+void fac(){ int i; f[0] = 1; rep(i, 1, N) f[i] = f[i-1]*i%inf; in[N-1] = inv(f[N-1]); sep(i, N-1, 0) in[i-1] = i*in[i]%inf; }
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>power</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+</snippet>

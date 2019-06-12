@@ -1,0 +1,32 @@
+<snippet>
+	<content><![CDATA[
+vi adj[N];
+int p[N][18], cnt, h[N];
+int upper(int a, int b){
+	return (in[a] <= in[b]) && (out[a] >= out[b]);
+}
+int lca(int a, int b){
+	if(a==0 || b==0) return max(a, b);
+	if(upper(a, b)) return a;
+	if(upper(b, a)) return b;
+	for(int i=17; i>=0; i--) if(!upper(p[a][i], b))
+		a = p[a][i];
+	return p[a][0];
+}
+
+void dfs(int id, int par)
+{
+	in[id] = ++cnt;
+	h[id] = h[par]+1;
+	p[id][0] = par;
+	for(int i=1; i<18; i++) p[id][i] = p[p[id][i-1]][i-1];
+	for(auto i:adj[id])
+		if(i!=par) dfs(i, id);
+	out[id] = cnt;
+}
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>lca</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+</snippet>

@@ -1,0 +1,27 @@
+<snippet>
+	<content><![CDATA[
+int combine(int a, int b){
+  return a+b;
+}
+int t[2 * N];
+void init() {  // build the tree
+  for (int i = n - 1; i > 0; --i) t[i] = combine(t[i<<1] , t[i<<1|1]);
+}
+void upd(int l, int r, int value) {
+  for (l += n, r += n; l < r; l >>= 1, r >>= 1) {
+    if (l&1) t[l] = combine(t[l++], value);
+    if (r&1) t[--r] = combine(t[r], value);
+  }
+}
+
+int q(int p) {
+  int res = 0;
+  for (p += n; p > 0; p >>= 1) res = combine(t[p], res);
+  return res;
+}
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>point-query-range-upd</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+</snippet>

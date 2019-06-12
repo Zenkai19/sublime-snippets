@@ -1,0 +1,40 @@
+<snippet>
+	<content><![CDATA[
+vi adj[N];
+int par[N], cap[N][N];
+int bfs(int s, int t){
+	queue<ii>q;
+	int ans=0;
+	memset(par, -1, sizeof par);
+	par[s] = -2;
+	q.push(ii(s, inf));
+	while(!q.empty()){
+		ii it = q.front();
+		q.pop();
+		for(auto i:adj[it.x])
+		if(par[i]==-1 && cap[it.x][i]) {
+			par[i] = it.x;
+			int next = min(cap[it.x][i], it.y);
+			if(i==t) { ans = next; break;}
+			q.push(ii(i, next));
+		}
+	}
+	if(!ans) return 0;
+	while(t!=s){
+		cap[par[t]][t] -= ans;
+		cap[t][par[t]] += ans;
+		t = par[t];
+	}
+	return ans;
+}
+inline void add_edge(int a, int b, int c){
+	adj[a].pb(b);
+	adj[b].pb(a);
+	cap[a][b] = c;
+}
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>edmond-carp</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+</snippet>

@@ -1,0 +1,19 @@
+<snippet>
+	<content><![CDATA[
+int bit[N];
+void upd(int x,int val){
+	for(;x<=n;x+=(x&-x))
+		bit[x]+=val;
+}
+int q(int x){
+	int res=0;
+	for(;x>0;x-=(x&-x))
+		res+=bit[x];
+	return res;
+}
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>fenwick</tabTrigger> 
+	<!-- Optional: Set a scope to limit where the snippet wiint trigger -->
+	<!-- <scope>source.python</scope> -->
+</snippet>

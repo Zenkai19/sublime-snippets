@@ -1,0 +1,15 @@
+<snippet>
+	<content><![CDATA[
+int lg = 30, base[30];
+void try_gause(int a){
+    for(int i=lg-1; i>=0; i--)
+        if(a>>i&1) a^=base[i];
+    if(!a) return;
+    base[(int)log2(a)] = a;
+}
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>gauss</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+</snippet>

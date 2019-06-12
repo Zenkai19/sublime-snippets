@@ -1,0 +1,30 @@
+<snippet>
+	<content><![CDATA[
+vi adj[N];
+vi revadj[N];
+int vis[N];
+stack<int>stk;
+int comp[N];
+void dfs(int u){
+	if(vis[u])return;
+	vis[u]=1;
+	for(auto i:adj[u]){
+		dfs(i);
+	}
+	stk.push(u);
+}
+void revdfs(int u,int curcomp){
+	if(vis[u])return;
+	vis[u]=1;
+	comp[u]=curcomp;
+	for(auto i:revadj[u]){
+		revdfs(i,curcomp);
+	}
+}
+	]]>
+</content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>scc</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+</snippet>

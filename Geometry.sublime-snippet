@@ -1,0 +1,153 @@
+<snippet>
+	<content><![CDATA[
+// Distance of a point P from a line through A and B :
+template <class P>
+double lineDist(const P& a, const P& b, const P& p)
+{
+	return (double)(b-a).cross(p-a)/(b-a).dist();
+}
+// Distance of a point P from a line segment SE :
+typedef Point<double> P;
+double segDist(P& s, P& e, P& p)
+{
+	if (s==e) return (p-s).dist();
+	auto d = (e-s).dist2(), t = min(d,max(.0,(p-s).dot(e-s)));
+	return ((p-s)*d-(e-s)*t).dist()/d;
+}
+// Intersection of lines along S1E1 and S2E2 :
+// Returns 1 if one intersection and R is set to this point
+// Returns 0 if no intersection
+// Returns -1 if infinite intersection or lines are invalid (S1==E1 || S2==E2)
+int line_Intersection(const P& s1, const P& e1, const P& s2, const P& e2, P& r)
+{
+	if ((e1-s1).cross(e2-s2)) { // if not parallel
+		r = s2-(e2-s2)*(e1-s1).cross(s2-s1)/(e1-s1).cross(e2-s2);
+		return 1;
+	}
+	else return -((e1-s1).cross(s2-s1)==0 || s2==e2);
+}
+// Intersection of segments S1E1 and S2E2 :
+// Returns 0 if no intersection
+// Returns 1 if one intersection, R1 is set to this point
+// Returns 2 if infinite intersections, R1 R2 is set to the line segment of intersection.
+int segment_Intersection(const P& s1, const P& e1,const P& s2, const P& e2, P& r1, P& r2)
+{
+	if (e1==s1) {
+		if (e2==s2) {
+			if (e1==e2) { r1=e1; return 1; } // all equal
+			else return 0;
+			// different point segments
+		} 
+		else return segment_Intersection(s2,e2,s1,e1,r1,r2); //swap
+	}
+	// segment directions and separation
+	P v1=e1-s1,v2=e2-s2,d=s2-s1;
+	auto a=v1.cross(v2),a1=v1.cross(d),a2=v2.cross(d);
+	if (a==0)
+	{ // if parallel
+		auto b1=s1.dot(v1), c1=e1.dot(v1),
+		b2=s2.dot(v1), c2=e2.dot(v1);
+		if (a1 || a2 || max(b1,min(b2,c2))>min(c1,max(b2,c2)))
+			return 0;
+		r1 = min(b2,c2)<b1 ? s1 : (b2<c2 ? s2 : e2);
+		r2 = max(b2,c2)>c1 ? e1 : (b2>c2 ? s2 : e2);
+		return 2-(r1==r2);
+	}
+	if (a<0) { a=-a;a1=-a1;a2=-a2; }
+	if (0<a1 || a<-a1 || 0<a2 || a<-a2)
+		return 0;
+	r1=s1-v1*a2/a;
+	return 1;
+}
+
+Returns true if segments S1E1 and S2E2 intersect:
+bool segment_IntersectionQ(P s1, P e1, P s2, P e2){
+	if(e1==s1) {
+		if(e2==s2) return e1==e2;
+		swap(s1,s2);swap(e1,e2);
+	}
+	P v1=e1-s1,v2=e2-s2,d=s2-s1;
+	auto a=v1.cross(v2),a1=d.cross(v1),a2=d.cross(v2);
+	if(a==0) { // parallel
+		auto b1=s1.dot(v1),c1=e1.dot(v1),
+		b2=s2.dot(v1),c2=e2.dot(v1);
+		return !a1 && max(b1,min(b2,c2))<=min(c1,max(b2,c2));
+	}
+	if(a<0) { a=-a;a1=-a1;a2=-a2; }
+	return (0<=a1 && a1<=a && 0<=a2 && a2<=a);
+}
+
+// Side of point P as seen from S to E: (1 for left, 0 for on, -1 for right)
+int sideOf(const P& s, const P& e, const P& p) {
+	auto a = (e-s).cross(p-s);
+	return (a > 0) - (a < 0);
+}
+// Check if point P lies on segment SE:
+bool onSegment(const P& s, const P& e, const P& p) {
+	P ds = p-s, de = p-e;
+	return ds.cross(de) == 0 && ds.dot(de) <= 0;
+}
+// Area of polygon:
+template <class T>
+T polygonArea(vector<Point<T>>& v) {
+	T a=v.back().cross(v[0]);
+	rep(i,0,sz(v)-1) a+=v[i].cross(v[i+1]);
+	return a/2;
+}
+// Tangent from P on (C,R)
+template <class P>
+pair<P,P> circleTangents(const P &p, const P &c, double r) {
+	P a = p-c;
+	double x = r*r/a.dist2(), y = sqrt(x-x*x);
+	return make_pair(c+a*x+a.perp()*y, c+a*x-a.perp()*y);
+}
+
+// Point inside any polygon O(n) : // For strictly inside pass strict as true else pass false
+template <class It, class P>
+bool inside_Polygon(It begin, It end, const P& p, bool strict = true) { // (begin,end) should be in order
+	int n = 0; // number of intersections with line from p to (inf,p.y)
+	for (It i = begin, j = end-1; i != end; j = i++) {
+		// if p is on edge of polygon
+		if (onSegment(*i, *j, p)) return !strict;
+		n+=(max(i->y,j->y)>p.y && min(i->y,j->y)<=p.y && ((*j-*i).cross(p-*i)>0)==(i->y<=p.y));
+	}
+	return n&1; // inside if odd number of intersections
+}
+Usage:
+typedef Point<int> pi; vector<pi> v;
+v.push_back(pi(4,4)), v.push_back(pi(1,2)), v.push_back(pi(2,1));
+bool in = inside_Polygon(v.begin(),v.end(), pi(3,4), false);
+// Circumcentre and circumradius of a triangle ABC:
+typedef Point<double> P;
+double circum_radius(const P& A, const P& B, const P& C) {
+	return (B-A).dist()*(C-B).dist()*(A-C).dist()/abs((B-A).cross(C-A))/2;
+}
+P circum_center(const P& A, const P& B, const P& C) {
+	P b = C-A, c = B-A;
+	return A + (b*c.dist2()-c*b.dist2()).perp()/b.cross(c)/2;
+}
+
+// Intersection Points of two circles with centre a , b and radius r1, r2:
+bool Circle_Intersection(P a, P b, double r1, double r2, pair<P, P>* out) {
+	P delta = b - a;
+	if (!delta.x && !delta.y) return false;
+	double r = r1 + r2, d2 = delta.dist2();
+	double p = (d2 + r1*r1 - r2*r2) / (2.0 * d2);
+	double h2 = r1*r1 - p*p*d2;
+	if (d2 > r*r || h2 < 0) return false;
+	P mid = a + delta*p, per = delta.perp() * sqrt(h2 / d2);
+	*out = {mid + per, mid - per};
+	return true;
+}
+// Reflection of P on line AB :
+template <class P>
+P reflection(const P& a, const P& b, const P& p)
+{
+	return a+(b-a)*((b-a).dot(p-a)/(b-a).dist2());
+}
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>Geometry</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+</snippet>

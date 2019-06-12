@@ -1,0 +1,27 @@
+<snippet>
+	<content><![CDATA[
+int t[2 * N];
+inline int func(int a, int b){
+	return a+b;
+}
+void init() {
+  for (int i = n - 1; i > 0; --i) t[i] = func(t[i<<1] , t[i<<1|1]);
+}
+void upd(int p, int value) {
+  for (t[p += n-1] = value; p > 1; p >>= 1) t[p>>1] = func(t[p] , t[p^1]);
+}
+
+int q(int l, int r) {
+  int res = inf;
+  for (l += n-1, r += n; l < r; l >>= 1, r >>= 1) {
+    if (l&1) res = func(res, t[l++]);
+    if (r&1) res = func(res, t[--r]);
+  }
+  return res;
+}
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>seg-tree</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+</snippet>

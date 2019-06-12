@@ -1,0 +1,131 @@
+<snippet>
+	<content><![CDATA[
+vi suff, lcp, invSuff;
+struct ST{
+    vector<map<int,int>> next;
+    vi len,start,link,s;
+    int node,pos,N,n;
+    ST(): node(0),pos(0),N(0),n(0){
+        make_node(0,0);
+    }
+    ii get_label(int k){
+        int l=start[k];
+        int r=min(l+len[k]-1,n-1);
+        return {l,r};
+    }
+    int make_node(int _start, int _len)
+    {
+        next.emplace_back();
+        link.emplace_back(0);
+        start.emplace_back(_start);
+        len.emplace_back(_len);
+        return N++;
+    }
+    void go_edge()
+    {
+        while(next[node].count(s[n-pos]) && pos > len[next[node][s[n - pos]]])
+        {
+            node = next[node][s[n - pos]];
+            pos -= len[node];
+        }
+    }
+    void add_letter(int c)
+    {
+        s.pb(c);
+        n++;
+        pos++;
+        int last = 0;
+        while(pos > 0)
+        {
+            go_edge();
+            int edge = s[n - pos];
+            int &v = next[node][edge];
+            int t = s[start[v] + pos - 1];
+            if(v == 0)
+            {
+                v = make_node(n - pos, inf);
+                link[last] = node;
+                last = 0;
+            }
+            else if(t == c)
+            {
+                link[last] = node;
+                return;
+            }
+            else
+            {
+                int u = make_node(start[v], pos - 1);
+                next[u][c] = make_node(n - 1, inf);
+                next[u][t] = v;
+                start[v] += pos - 1;
+                len [v] -= pos - 1;
+                v = u;
+                link[last] = u;
+                last = u;
+            }
+            if(node == 0)
+                pos--;
+            else
+                node = link[node];
+        }
+    }
+    int idx;
+    void mark_leaves(int u,int l){
+        ii x=get_label(u);
+        l+=x.y-x.x+1;
+        if(next[u].empty()){
+            suff[idx]=n-l;
+            invSuff[n-l]=idx;
+            idx++;
+            return;
+        }
+        for(auto it=next[u].begin();it!=next[u].end();it++)
+            mark_leaves(it->y,l);
+    }
+    void build_suffix_array(){
+        suff.resize(n);
+        invSuff.resize(n);
+        idx=0;
+        mark_leaves(0,0);
+    }
+    void kasai(){
+        lcp.resize(n);
+        int i,j,k=0;
+        for(i=0;i<n;i++)
+        if(invSuff[i]!=n-1){
+            for(j=suff[invSuff[i]+1];i+k<n&&j+k<n&&s[i+k]==s[j+k];) k++;
+            lcp[invSuff[i]]=k;
+            if(k)k--;
+        }
+    }
+};
+ST st;
+int f[1<<20][20];
+int sparse(int a, int b){
+    if(a==b) return n-a;
+    int x = min(abs(a-b), min(n-a, n-b));
+    a = invSuff[a]; b=invSuff[b];
+    if(a>b) swap(a, b);
+    int c = log2(b-a);
+    return min(x, min(f[a][c], f[b-(1<<c)][c]));
+}
+// (lcp, suff and invSuff 0 indexed), lcp[0]= lcp b/w 0th and 1st suffix in sa.
+void pre(){
+    for(auto i:s) st.add_letter((int)i);
+    st.add_letter(20);
+    st.build_suffix_array();
+    st.kasai();
+    for(int i=0; i<n; i++) f[i][0]=lcp[i];
+    for(int i=1; i<20; i++){
+        for(int j=0; j<n; j++) {
+            if(j+(1<<i) < n) f[j][i]=min(f[j][i-1], f[j+(1<<i-1)][i-1]);
+            else f[j][i] = f[j][i-1];
+        }
+    }
+}
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>suffix-tree</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+</snippet>

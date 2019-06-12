@@ -1,0 +1,18 @@
+<snippet>
+	<content><![CDATA[
+int dp[N];
+int solve(int mask){
+    if(mask<(1<<20) && dp[mask]!=-1)
+        return dp[mask];
+    int max_bit = log2(mask), ans;
+    ans = solve(mask^1LL<<max_bit);
+    ans = max(ans, solve((mask^1LL<<max_bit)&adj[max_bit])+1);
+    if(mask<1<<20) return dp[mask] = ans;
+    return ans;
+}
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>max-clique or max-independent set</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+</snippet>

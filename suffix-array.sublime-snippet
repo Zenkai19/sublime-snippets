@@ -1,0 +1,63 @@
+<snippet>
+	<content><![CDATA[
+string s;
+int suff[N], invSuff[N], tmp[N], lcp[N], gap;
+bool sufCmp(int i, int j)
+{
+    if (invSuff[i] != invSuff[j])
+        return invSuff[i] < invSuff[j];
+    i += gap;
+    j += gap;
+    return (i < N && j < N) ? invSuff[i] < invSuff[j] : i > j;
+}
+
+void buildSA()
+{
+    n = s.size();;
+    for(int i=0; i<n; i++) suff[i] = i, invSuff[i] = s[i];
+    for (gap = 1;; gap *= 2)
+    {
+        sort(suff, suff + n, sufCmp);
+        for(int i=0; i<n-1; i++) tmp[i + 1] = tmp[i] + sufCmp(suff[i], suff[i + 1]);
+        for(int i=0; i<n; i++) invSuff[suff[i]] = tmp[i];
+        if (tmp[n - 1] == n - 1) break;
+    }
+}
+
+void buildLCP()
+{
+    for (int i = 0, k = 0; i < n; ++i) if (invSuff[i] != n - 1)
+    {
+        for (int j = suff[invSuff[i] + 1]; s[i + k] == s[j + k];)
+        ++k;
+        lcp[invSuff[i]] = k;
+        if (k)--k;
+    }
+}
+int f[1<<20][20];
+inline int util(int a, int b){
+    if(a==b) return n-a;
+    int x = min(abs(a-b), min(n-a, n-b));
+    a = invSuff[a]; b=invSuff[b];
+    if(a>b) swap(a, b);
+    int c = log2(b-a);
+    return min(x, min(f[a][c], f[b-(1<<c)][c]));
+}
+void pre(){
+    buildSA();
+    buildLCP();
+    for(int i=0; i<n; i++) f[i][0]=lcp[i];
+    for(int i=1; i<20; i++){
+        for(int j=0; j<n; j++) {
+            if(j+(1<<i) < n) f[j][i]=min(f[j][i-1], f[j+(1<<i-1)][i-1]);
+            else f[j][i] = f[j][i-1];
+        }
+    }
+}
+// (lcp, suff, invSuff 0 indexed) lcp[0] b/w 0th and 1st suffixes in sorted order 
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>suffix-array</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+</snippet>

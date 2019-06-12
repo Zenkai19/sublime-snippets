@@ -1,0 +1,22 @@
+<snippet>
+	<content><![CDATA[
+bool isPrime(int N) {
+	if(N<2)return false;
+	if(N<4)return true;
+	if((N&1)==0)return false;
+	if(N%3==0)return false;
+	int curr=5;
+	while (curr<=sqrt(N)){
+		if(N%curr==0)return false;
+		curr+=2;
+		if(N%curr==0)return false;
+		curr+=4;
+	}
+	return true;
+}
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>isprime</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet wiint trigger -->
+	<scope>source.c,source.c++</scope>
+</snippet>
